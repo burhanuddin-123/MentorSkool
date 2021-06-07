@@ -7,8 +7,19 @@ import mysql.connector
 class Loader:
     def __init__(self,file):
         global data
-        data = pd.read_csv(file)
-        data.fillna("None", inplace=True)
+        try:
+            data = pd.read_csv(file)
+            data.fillna("None", inplace=True)
+        except FileNotFoundError as fer:
+            print(fer.filename, ":-", fer.strerror)
+        except IOError as ier:
+            print("Input Error", ier)
+        except PermissionError as per:
+            print("Permission Error", per)
+        except ParserError as par:
+            print(f"{file} type is Incorrect as appropriate type should be '.csv' or {file} is corrupted")
+        except Exception:
+            print(sys.exc_info())
     #Required arguments are db_name and table_name
     def load(self,db_name,table_name,host="localhost",user="root",password=""):
         mydb = mysql.connector.connect(
@@ -19,8 +30,12 @@ class Loader:
         mycursor = mydb.cursor()
 
         #Creating Database
-        mycursor.execute("CREATE DATABASE %s" % db_name)
-        print("Database successfully created")
+        try:
+            mycursor.execute("CREATE DATABASE %s" % db_name)
+        except mysql.connector.Error as err:
+            print(err.msg)
+        else:
+            print("Database successfully created")
         mydb.close()
 
         #Creating table
@@ -43,24 +58,30 @@ class Loader:
         )
         mycursor = mydb.cursor()
 
-        i = 0
-        for i in range(len(list_data)):
-            if i==0:
-                mycursor.execute(f"CREATE TABLE {table_name} ( {list_data[i]} {proper_datatype[i]} )")
-                i = i+1
-            else:
-                mycursor.execute(f"ALTER TABLE {table_name} ADD {list_data[i]} {proper_datatype[i]}")
-                i = i+1
-        print("Table successfully created")
+        try:
+            for i in range(len(list_data)):
+                if i == 0:
+                    mycursor.execute(f"CREATE TABLE {table_name} ( {list_data[i]} {proper_datatype[i]} )")
+                    i = i + 1
+                else:
+                    mycursor.execute(f"ALTER TABLE {table_name} ADD {list_data[i]} {proper_datatype[i]}")
+                    i = i + 1
+        except mysql.connector.Error as err:
+            print(err.msg)
+        else:
+            print("Table successfully created")
 
 
         #Inserting Records
         data.fillna("None", inplace=True)
-
-        for index, product in data.iterrows():
-            sql = f"INSERT INTO {db_name}.{table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            mycursor.execute(sql, tuple(product))
-        print("Records Inserted Successfully")
+        try:
+            for index, product in data.iterrows():
+                sql = f"INSERT INTO {db_name}.{table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                mycursor.execute(sql, tuple(product))
+        except mysql.connector.Error as err:
+                print(err)
+        else:
+            print("Records Inserted Successfully")
         mydb.commit()
         mydb.close()
 
