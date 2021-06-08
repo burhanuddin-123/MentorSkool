@@ -22,12 +22,19 @@ class Loader:
             print(sys.exc_info())
     #Required arguments are db_name and table_name
     def load(self,db_name,table_name,host="localhost",user="root",password=""):
-        mydb = mysql.connector.connect(
-            host = host,
-            user = user,
-            password = password
-        )
-        mycursor = mydb.cursor()
+        try:
+            mydb = mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password
+            )
+        except mysql.connector.Error as err:
+            # print(err.msg)
+            # print(err)
+            print("Connection can't be established. Check whether the Sql server is on or not")
+            return
+        else:
+            mycursor = mydb.cursor()
 
         #Creating Database
         try:
@@ -79,7 +86,7 @@ class Loader:
                 sql = f"INSERT INTO {db_name}.{table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 mycursor.execute(sql, tuple(product))
         except mysql.connector.Error as err:
-                print(err)
+            print(err)
         else:
             print("Records Inserted Successfully")
         mydb.commit()
