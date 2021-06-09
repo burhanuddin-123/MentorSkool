@@ -6,9 +6,10 @@ import pandas as pd
 import mysql.connector
 import sys
 
+
 class Loader:
-## Initialization of code that is Constructor
-    def __init__(self,file):
+    ## Initialization of code that is Constructor
+    def __init__(self, file):
         try:
             self.data = pd.read_csv(file)
         except FileNotFoundError as fer:
@@ -22,10 +23,10 @@ class Loader:
         except Exception:
             print(sys.exc_info())
 
-## Establishing Connection
-###########################################################
+    ## Establishing Connection
+    ###########################################################
 
-    def get_cursor(self,host,user,password,database=""):
+    def get_cursor(self, host, user, password, database=""):
 
         return mysql.connector.connect(
             host=host,
@@ -34,29 +35,31 @@ class Loader:
             database=database
         )
 
-## Creating database
-###########################################################
+    ## Creating database
+    ###########################################################
 
-    def create_database(self,host,user,password,db_name):
+    def create_database(self, host, user, password, db_name):
         try:
-            mydb = self.get_cursor(host,user,password)
+            self.mydb = self.get_cursor(host, user, password)
         except mysql.connector.Error:
             print("Connection can't be established. Check whether the Sql server is on or not")
             return
         else:
-            cursor = mydb.cursor()
+            self.cursor = self.mydb.cursor()
             try:
-                cursor.execute(f"CREATE DATABASE {db_name}")
+                self.cursor.execute(f"CREATE DATABASE {db_name}")
             except mysql.connector.Error as err:
                 print(err.msg)
             else:
                 print("Database successfully created")
-                mydb.close()
+                # mydb.close()
 
-## Creating Table
-###########################################################
+    ## Creating Table
+    ###########################################################
 
-    def create_table(self,host,user,password,db_name,table_name):
+    def create_table(self, db_name, table_name):
+
+        ## Fetching columns and its datatype from csv file
         self.list_data = list(self.data.columns)
         list_datatype = list(self.data.dtypes)
         self.proper_datatype = []
@@ -67,43 +70,47 @@ class Loader:
                 self.proper_datatype.append("INT")
             else:
                 self.proper_datatype.append("NUMBER")
+
+        ## Creating table after fetching columns from csv
         try:
-            self.mydb = self.get_cursor(host, user, password,db_name)
-        except mysql.connector.Error:
-            print("Connection can't be established. Check whether the Sql server is on or not")
+            self.cursor.execute(f"CREATE TABLE {db_name}.{table_name} ( {self.list_data[0]} {self.proper_datatype[0]} ) ")
+        except mysql.connector.Error as err:
+            print("Can't Create Table :-", err.msg)
             return
         else:
-            self.cursor = self.mydb.cursor()
-            try:
-                self.cursor.execute(f"CREATE TABLE {table_name} ( {self.list_data[0]} {self.proper_datatype[0]} ) ")
-            except mysql.connector.Error as err:
-                print("Can't Create Table :-",err.msg)
-                return
-            else:
-                print(f"Table {table_name} succesfully created")
+            print(f"Table {table_name} succesfully created")
 
-## Altering Table
-###########################################################
+    ## Altering Table
+    ###########################################################
 
-    def alter_table(self,table_name):
+    def alter_table(self, db_name, table_name):
         try:
-            for i in range(1,len(self.list_data)):
-                self.cursor.execute(f"ALTER TABLE {table_name} ADD {self.list_data[i]} {self.proper_datatype[i]}")
+            for i in range(1, len(self.list_data)):
+                self.cursor.execute(
+                    f"ALTER TABLE {db_name}.{table_name} ADD {self.list_data[i]} {self.proper_datatype[i]}")
         except mysql.connector.Error:
             print(f"Can't Alter Table '{table_name}'")
             return
         else:
             print(f"Table {table_name} succesfully Altered")
 
-## Load the csv file data to sql table
-###########################################################
+    ## Load the csv file data to sql table
+    ###########################################################
 
-    def load_data_in(self,table_name):
+    def load_data_in(self, db_name, table_name):
         self.data.fillna("None", inplace=True)
         try:
             for index, product in self.data.iterrows():
-                sql = f"INSERT INTO {table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                self.cursor.execute(sql, tuple(product))
+                # sql = f"INSERT INTO {table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+                ##Dynamic query
+                self.cursor.execute(f"INSERT INTO {db_name}.{table_name} VALUES {tuple(product)} ")
+
+                # Another way
+                # str_s = ','.join(['%s'] * len(self.list_data))
+                # sql = '''INSERT INTO %s.%s VALUES (%s) ''' % (db_name,table_name,str_s)
+                # self.cursor.execute(sql,tuple(product))
+
         except mysql.connector.Error as err:
             print(err)
         else:
@@ -111,11 +118,11 @@ class Loader:
         self.mydb.commit()
         self.mydb.close()
 
-## Function Calls
-###########################################################
+    ## Function Calls
+    ###########################################################
 
-    def load(self,db_name,table_name,host="localhost",user="root",password=""):
-        self.create_database(host,user,password,db_name)
-        self.create_table(host,user,password,db_name,table_name)
-        self.alter_table(table_name)
-        self.load_data_in(table_name)
+    def load(self, db_name, table_name, host="localhost", user="root", password=""):
+        self.create_database(host, user, password, db_name)
+        self.create_table(db_name, table_name)
+        self.alter_table(db_name, table_name)
+        self.load_data_in(db_name, table_name)
