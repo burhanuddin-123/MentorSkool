@@ -1,0 +1,3 @@
+pandas
+pandas.errors
+mysql.connector
