@@ -1,4 +1,4 @@
-## Importing Differnt modules
+# Importing Differnt modules
 ###########################################################
 
 from pandas.errors import ParserError
@@ -32,29 +32,29 @@ class Loader:
                 user=user,
                 password=password,
             )
-        except mysql.connector.Error:
-            print("Connection can't be established. Check whether the Sql server is on or not")
-            return
-        else:
-            self.cursor = self.mydb.cursor()
-
+            #
+            cursor = self.mydb.cursor()
+            return cursor
+        except mysql.connector.Error as err:
+            print(err)
+            return None
 
 ## Creating database
 ###########################################################
 
-    def create_database(self,db_name):
+    def create_database(self,cursor,db_name):
         try:
-            self.cursor.execute(f"CREATE DATABASE {db_name}")
+            cursor.execute(f"CREATE DATABASE {db_name}")
+            return True
         except mysql.connector.Error as err:
             print(err.msg)
-        else:
-            print("Database successfully created")
+            return None
             # mydb.close()
 
 ## Creating Table
 ###########################################################
 
-    def create_table(self,db_name,table_name):
+    def create_table(self,cursor,db_name,table_name):
         self.list_data = list(self.data.columns)
         list_datatype = list(self.data.dtypes)
         self.proper_datatype = []
@@ -65,6 +65,7 @@ class Loader:
                 self.proper_datatype.append("INT")
             else:
                 self.proper_datatype.append("NUMBER")
+
         # try:
         #     self.mydb = self.get_cursor(host, user, password,db_name)
         # except mysql.connector.Error:
@@ -72,57 +73,78 @@ class Loader:
         #     return
         # else:
         #     self.cursor = self.mydb.cursor()
+
         try:
-            self.cursor.execute(f"CREATE TABLE {db_name}.{table_name} ( {self.list_data[0]} {self.proper_datatype[0]} ) ")
+            cursor.execute(f"CREATE TABLE {db_name}.{table_name} ( {self.list_data[0]} {self.proper_datatype[0]} ) ")
+            return True
         except mysql.connector.Error as err:
             print("Can't Create Table :-",err.msg)
-            return
-        else:
-            print(f"Table {table_name} succesfully created")
+            return None
 
 ## Altering Table
 ###########################################################
 
-    def alter_table(self,db_name,table_name):
+    def alter_table(self,cursor,db_name,table_name):
         try:
             for i in range(1,len(self.list_data)):
-                self.cursor.execute(f"ALTER TABLE {db_name}.{table_name} ADD {self.list_data[i]} {self.proper_datatype[i]}")
+                cursor.execute(f"ALTER TABLE {db_name}.{table_name} ADD {self.list_data[i]} {self.proper_datatype[i]}")
+            return True
         except mysql.connector.Error:
             print(f"Can't Alter Table '{table_name}'")
-            return
-        else:
-            print(f"Table {table_name} succesfully Altered")
+            return None
 
 ## Load the csv file data to sql table
 ###########################################################
 
-    def load_data_in(self,db_name,table_name):
+    def load_data_in(self,cursor,db_name,table_name):
         self.data.fillna("None", inplace=True)
         try:
             for index, product in self.data.iterrows():
                 # sql = f"INSERT INTO {table_name} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
                 ##Dynamic query
-                self.cursor.execute(f"INSERT INTO {db_name}.{table_name} VALUES {tuple(product)} ")
+                cursor.execute(f"INSERT INTO {db_name}.{table_name} VALUES {tuple(product)} ")
 
-                # Another way
+                ### Another way
                 # str_s = ','.join(['%s'] * len(self.list_data))
                 # sql = '''INSERT INTO %s.%s VALUES (%s) ''' % (db_name,table_name,str_s)
                 # self.cursor.execute(sql,tuple(product))
-
+            return True
         except mysql.connector.Error as err:
             print(err)
-        else:
-            print("Records Inserted Successfully")
-        self.mydb.commit()
-        self.mydb.close()
+            return None
 
 ## Function Calls
 ###########################################################
 
     def load(self,db_name,table_name,host="localhost",user="root",password=""):
-        self.get_cursor(host,user,password)
-        self.create_database(db_name)
-        self.create_table(db_name,table_name)
-        self.alter_table(db_name,table_name)
-        self.load_data_in(db_name,table_name)
+        cursor = self.get_cursor(host,user,password)
+        if not cursor:
+            print("Connection Failed")
+            return
+
+        status = self.create_database(cursor,db_name)
+        if not status:
+            print("Database Creation Failed")
+            return
+        print("Database Created Successfully")
+
+        status = self.create_table(cursor,db_name,table_name)
+        if not status:
+            print("Table Creation Failed")
+            return
+        else:
+            status = self.alter_table(cursor,db_name,table_name)
+            if not status:
+                print("Table is not properly created")
+                return
+        print("Table Created Successfully")
+
+        # self.alter_table(db_name,table_name)
+        status = self.load_data_in(cursor,db_name,table_name)
+        if not status:
+            print("Records Can't be loaded")
+            return
+        print("Records Inserted Successfully")
+        self.mydb.commit() # After inserting records we are committing it or saving it permanently in database
+        self.mydb.close() # Closing the connection
