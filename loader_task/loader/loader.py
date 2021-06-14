@@ -78,7 +78,6 @@ class Loader:
             cursor.execute(f"CREATE TABLE {db_name}.{table_name} ( {self.list_data[0]} {self.proper_datatype[0]} ) ")
             return True
         except mysql.connector.Error as err:
-            print("Can't Create Table :-",err.msg)
             return None
 
 ## Altering Table
@@ -90,7 +89,6 @@ class Loader:
                 cursor.execute(f"ALTER TABLE {db_name}.{table_name} ADD {self.list_data[i]} {self.proper_datatype[i]}")
             return True
         except mysql.connector.Error:
-            print(f"Can't Alter Table '{table_name}'")
             return None
 
 ## Load the csv file data to sql table
