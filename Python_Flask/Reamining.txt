@@ -4,4 +4,5 @@ Csv to JSON :-
 2. After that it should be properly displayed in the aanother html page ... Work on it !!!
 3. Also fetch row headers name that is product_id, name etc....
 4. Give that name to their values.
-5. Create the proper json file and embed in html and siplay to the user. 
+5. Create the proper json file and embed in html and siplay to the user.
+6. Also add exception handling part so that if user insert any other file or not insert any file then on submit an exception should be displayed to user.
