@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Uploading File</title>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+     <title>Uploading File</title>
+     <link rel="stylesheet" href='/static/style.css' />
 </head>
 <body>
-<form action="http://localhost:5000/upload" method="POST"> <!-- enctype="multipart/form-data"> -->
-    <input type="file" name="csv" />
+<h1><u>Upload File</u></h1>
+<div align="center">
+<form id="form1" action="http://localhost:5000/upload" method="POST"> <!-- enctype="multipart/form-data"> -->
+    <input type="text" id="Text1" placeholder="Enter your name"><br/><br/>
+    <input type="file" name="csv" id="file-input" /><br />
     <input type="submit" value="submit" />
 </form>
+</div>
 </body>
 </html>
