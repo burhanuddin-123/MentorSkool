@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanks!!!!</title>
+</head>
+<body>
+<h1>Thanks For Registration !!!</h1>
+<table border="1">
+    {% for key,values in result.items() %}
+    <tr>
+        <th style="font-size:25px"> {{ key }} </th>
+        <td style="font-size:20px"> {{ values }} </td>
+    </tr>
+{% endfor %}
+</table>
+</body>
+</html>
+

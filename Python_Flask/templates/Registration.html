@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Form Validation</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<!-- Not coming the expected output -->
+<body>
+	<div class="main">
+		<h1><b style="color:black;">REGISTRATION FORM</b></h1>
+		<div class="form1">
+		<!--	Registration Form<br>!-->
+			<form name="simple" method="post" action="http://localhost:5000/register_success">
+				<input type="text" id="req1" placeholder="Firstname"><br><br>
+				<input type="text" id="req2" placeholder="Lastname"><br><br>
+				<input type="text" id="req3" placeholder="Email address"><br><br>
+				<input type="text" id="req4" placeholder="Contact number" name="phone"><br><br>
+				<input type="password" id="req5" placeholder="Password"><br><br>
+				<input type="text" id="req6" placeholder="Enter Pincode"><br><br>
+							D.O.B<br><input type="date" name="bday"><br><br>
+	<!--Gender:
+	<br>
+	<input type="radio" name="gender">Male <input type="radio" name="gender">Female-->
+				Gender:
+				<select id="selection">
+					<option>Gender</option>
+					<option>Male</option>
+					<option>Female</option>
+				</select>
+				<br><br>
+				<input type="submit" value="Submit"><br><br>
+				<input type="reset" value="Clear">
+
+
+				<!-- onclick="emailValidate(document.getElementById('req3'),'Invalid Email id.'),/*isNumeric(document.getElementById('req4'),'Enter digits in contact no.'),*/Selection(document.getElementById('selection'),'Please select gender')"> -->
+
+
+			</form>
+		</div>	
+	</div>
+
+
+</body>
+</html>
+
