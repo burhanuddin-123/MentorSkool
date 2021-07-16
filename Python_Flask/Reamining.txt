@@ -1,0 +1,7 @@
+Csv to JSON :-
+
+1. Add proper GUI to the upload_file..
+2. After that it should be properly displayed in the aanother html page ... Work on it !!!
+3. Also fetch row headers name that is product_id, name etc....
+4. Give that name to their values.
+5. Create the proper json file and embed in html and siplay to the user. 
