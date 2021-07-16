@@ -51,6 +51,15 @@ input{
 	border-radius: 7px;
 	text-align: center;
 }
+label{
+	width: 330px;
+	height: 30px;
+	border-radius: 7px;
+	text-align: center;
+	font-size: 25px;
+	color: rgb(55,50,150);
+	text-decoration: underline;
+}
 
 input[type="file"]:hover{
     color: green;
@@ -59,3 +68,4 @@ input[type="submit"]:hover{
     color: white;
     background-color: red;
 }
+
