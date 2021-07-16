@@ -6,3 +6,4 @@ Csv to JSON :-
 4. Give that name to their values.
 5. Create the proper json file and embed in html and siplay to the user.
 6. Also add exception handling part so that if user insert any other file or not insert any file then on submit, an exception should be displayed to user.
+7. Add radio button or drop down list to the html which contains 2 option that is Csv to Json or Json to Csv. I csv to json selected then we have to upload csv file that will get converted into appropriate json file.And if json to csv is selected then we have to upload json file which will gets converted into appropriate csv file.
