@@ -86,7 +86,7 @@ for i in range(len(year)):
         x = soup.find_all('div', class_='cb-col-25 cb-col pad10')
         for i in x:
             fetch_date = int(list(i.children)[0].get('ng-bind')[:11])
-            date.append(datetime.fromtimestamp(fetch_date).strftime('%Y-%m-%d %H:%M:%S'))
+            date.append(datetime.fromtimestamp(fetch_date).strftime('%Y-%m-%d %H:%M:%S'))    # <span ng-bind=" 1554215400000| date:'MMM dd, EEE' : '+05:30'">
             # date.append(list(i.children)[0].get('ng-bind'))  # we will use append instead of extend as we are inserting individual element, while extend is used when we have to insert a complete list
         # date.extend(scrap_attr(x, 0, 'ng-bind'))
 
