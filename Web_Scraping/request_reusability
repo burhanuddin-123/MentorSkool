@@ -1,0 +1,88 @@
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+# def scrap(tag):
+#     for i in x:
+#         print(list(i.children)[0].find(tag))
+
+# def scrap_attr(tag,attr,link=""):
+#     for i in x:
+#         print(link + list(i.children)[0].find(tag)[attr])
+
+def scrap(list_,index_,tag,flag=0):
+    if flag==1:
+        for i in list_:
+            print(list(i.children)[index_].find(tag).text)
+        return
+    for i in list_:
+        print(list(i.children)[index_].find(tag))
+
+def scrap_attr(list_,index,tag,attr,link=""):
+    if link == "":
+        for i in list_:
+            print(list(i.children)[index].find(tag).get(attr))
+            # print(list(i.children)[index].find(tag)[attr]) # same as above
+        return
+    for i in list_:
+        print(link + list(i.children)[index].find(tag)[attr])
+        # print(link + list(i.children)[index].find(tag).get(attr))
+
+
+    ## Gives error that is 'str' object has no attribute 'text'
+    # for i in list_:
+    #     print(link + list(i.children)[index].find(tag)[attr])
+
+
+# Giving error
+# def scrap_child_tag(list_,index,tag):
+#     for i in list_:
+#         print(list(list(i.children)[index].children.find(tag)))
+
+
+def scrap_child_using_index(list_,list_index,child_index,flag=0):
+    if flag==1:
+        for i in list_:
+            print(list(list(i.children)[list_index].children)[child_index].text)
+        return
+    for i in list_:
+        print(list(list(i.children)[list_index].children)[child_index])
+
+
+page = requests.get('https://www.cricbuzz.com/cricket-series/2810/indian-premier-league-2019/matches')
+
+soup = BeautifulSoup(page.content,"html.parser")
+print(soup.prettify())
+
+x = soup.find_all('div',class_='cb-col-75 cb-col')
+
+# scrap('span')
+# scrap('div')
+# scrap_attr('a','href','https://www.cricbuzz.com') # with baselink
+# scrap_attr('a','href') # without baselink
+
+# scrap(x,0,'span')
+# scrap(x,0,'div')
+# scrap_attr(x,0,'a','href')
+# scrap_attr(x,0,'a','class')
+# scrap_attr(x,0,'a','href','https://www.cricbuzz.com') # with baselink
+# scrap_child_using_index(x,0,2)
+# scrap(x,0,'span',flag=1)
+
+# scrap_child_tag(x,0,'a') # error
+
+
+
+##############################################
+## Error with find_all() method
+# x = soup.find_all('div',class_='cb-col-75 cb-col').find_all('div',class_='cb-col-60 cb-col cb-srs-mtchs-tm')
+# print(x.findChild())
+# print(x.findChild().text)
+
+# x = soup.find('div',class_='cb-col-75 cb-col').find('div',class_='cb-col-60 cb-col cb-srs-mtchs-tm')
+# # print(x.findChild()) # will print only 1 child
+# for i in x:
+#     print(i.text)
+#     # print(list(i.text))
+
+
